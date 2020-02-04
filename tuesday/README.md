@@ -299,3 +299,32 @@ Sometimes you need to delete the pod to remove override complications
 	  APIUrl: "https://my.api.com/api/v1"
 	  username: token
 	  password: thesecrettoken
+
+## Security Contexts
+
+### Using foo10.yaml
+
+	securityContext:
+		runAsUser: 2001
+		runAsGroup: 3001
+		fsGroup: 3001
+
+## Service Accounts
+	kubectl create sa my-service-account
+	k get sa
+	k describe serviceaccount my-service-account
+	
+### Using foo12.yaml
+
+	k apply -f foo.yaml
+	k describe pod my-pod
+	k get pod -o yaml
+	k get pod my-pod -o yaml
+	> ...
+	  serviceAccountName: myServiceAccount
+
+## Lab
+
+[Pod Creation](https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/activities/labs/lab1/)
+
+[Pod Config](https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/activities/labs/lab2/)
