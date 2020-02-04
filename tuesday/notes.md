@@ -2,6 +2,39 @@
 
 [https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/configuration/](https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/configuration/)
 
+## Summary of Commands
+
+kubectl to k
+	
+	alias k=kubectl
+
+List pods
+
+	k get pods
+
+Apply pod yaml
+
+	k apply -f foo.yaml
+
+Delete pod
+
+	k delete my-pod
+
+List config maps
+
+	k get cm
+
+Apply config map yaml
+
+	k apply -f cm.yaml
+
+List logs
+
+	k logs my-pod
+
+
+##
+
 Sometimes pods won't show unless you add `-A` tag
 
 	k get pods
@@ -28,7 +61,7 @@ Namespace `bar` does not appear unless `-n bar` added
 
 	k get pods -n bar
 	
-**Trick for yaml**
+#### Trick for yaml
 
 Put this between two sections to create separate yaml files
 
@@ -55,7 +88,7 @@ This is okay too
 
 	k apply -f https://...
 
-### Config Maps
+## Config Maps
 
 Print resources
 
@@ -78,6 +111,33 @@ Validate that the config map has been changed
 
 	k describe cm my-cm
 
-Can delete and create a new pod to update it 
+Can delete and create a new pod to update it
 
 	k delete pod my-pod
+
+### Using foo3.yaml
+
+Apply yaml to pod 	
+	
+	k apply -f foo.yaml
+
+Observe pod
+
+	k describe pod
+
+Observe Environment Variables
+
+	k logs my-pad
+* ^ note that 
+
+		color=black
+		location=naboo
+
+Restart pod
+
+If container seems to be running, `k exec`
+
+Two ways to pass information
+* environment variables
+* volume
+
