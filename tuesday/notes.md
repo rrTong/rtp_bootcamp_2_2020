@@ -210,15 +210,92 @@ List services
 
 	k get service
 
-#### Resource limits
+## Resource Requirements
+
+### Using foo6.yaml
+
 `foo.yaml` `spec.containers:`
 
 	limits:
 		memory: "128Mi"
 		cpu: "500m"
 
-If not enough memory, container gets killed and will auto restart; may often 400 / 500
-If not enough CPU, response will get throttled and take slower
+If not enough memory, container gets killed `oom` and will auto restart; may often 400 / 500
+If not enough CPU, response will get throttled and become slower
 
 Adding worker nodes and removing working nodes cost money, but it's easy in Kubernetes
 Ideally have a system that automatically scales up and down
+
+If you don't specify `resources.requests` or `resources.limits`:
+
+### Using resources.yaml
+
+	k apply -f resources.yaml
+	k get limitrange
+
+Kubernetes never scales pod, always scales container
+
+## Secrets
+
+	# Create files needed for rest of example. 
+	echo -n 'admin' > ./username.txt 
+	echo -n '1f2d1e2e67df' > ./password.txt
+	cat username.txt
+	> admin
+	cat password.txt
+	> 1f2d1e2e67df
+	kubectl create secret generic db-user-pass --from-file=./username.txt --from-file=./password.txt
+
+kubectl
+	
+	k get secrets
+	k get secrets db-user-pass
+	k get secrets db-user-pass -o yaml
+	k get secrets db-user-pass -o json
+	echo YWRtaW4= | base64 -D
+	> admin
+
+### Using foo7.yaml
+
+Change `data.username` from  `YWRtaW4=`:
+	
+	data:
+		username: <base64_replaceme>
+
+So that you don't store plaintext PII in repository
+Using base64 is a must
+
+### Using foo8.yaml
+
+	k apply -f foo.yaml
+	k get secrets mysecret-config -o yaml
+	> apiVersion: v1
+	  data:
+	    config.yaml: YXBpVXJsOiAiaHR0cHM6Ly9teS5hcGkuY29tL2FwaS92MSIKdXNlcm5hbWU6IHRva2VuCnBhc3N3b3JkOiB0aGVzZWNyZXR0b2tlbg==
+	echo YXBpVXJsOiAiaHR0cHM6Ly9teS5hcGkuY29tL2FwaS92MSIKdXNlcm5hbWU6IHRva2VuCnBhc3N3b3JkOiB0aGVzZWNyZXR0b2tlbg== | base64 -d
+	> apiUrl: "https://my.api.com/api/v1"
+	  username: token
+	  password: thesecrettoken
+
+To chain `get` arguments
+
+	k get secrets,cm
+
+Sometimes you need to delete the pod to remove override complications
+
+### Using foo9.yaml
+
+	k get pods
+	k delete pod my-pod
+	k apply -f foo.yaml
+
+`k exec` to run shell inside container
+
+	k exec -it my-pod bash
+	> ...
+	  SECRET=USERNAME=admin
+	  ...
+	> ...
+	  APIUrl: "https://my.api.com/api/v1"
+	  username: token
+	  password: thesecrettoken
