@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-inter-pod
+  labels:
+    app: jedi
+spec:
+  restartPolicy: Never
+  containers:
+    - name: myapp
+      image: busybox
+      ports:
+        - containerPort: 8080
+          name: http
+      env:
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      command: ["echo"]
+      args: ["$(MY_NODE_NAME) $(MY_POD_NAME) $(MY_POD_IP)"]

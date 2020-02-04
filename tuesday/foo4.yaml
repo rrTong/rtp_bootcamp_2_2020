@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-env-pod
+spec:
+  restartPolicy: Never
+  containers:
+  - name: c
+    image: busybox
+    env:
+    - name: DEMO_GREETING
+      value: "Hello from the environment"
+    command: ["echo"]
+    args: ["$(DEMO_GREETING)"]
