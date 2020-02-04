@@ -8,6 +8,17 @@ kubectl to k
 	
 	alias k=kubectl
 
+Command | Kind
+------- | ----- 
+apply     | pod
+get   | configmap (cm)
+delete  | namespace (ns)
+describe| service
+edit    | limitrange
+logs | secrets
+exec | serviceaccount
+top | node
+
 List pods
 
 	k get pods
@@ -95,7 +106,7 @@ Print resources
 
 	k get cm my-cm -o yaml
 
-	k describe cm my-cm -o
+	k describe cm my-cm -o yaml
 
 Get logs
 
@@ -328,3 +339,101 @@ Sometimes you need to delete the pod to remove override complications
 [Pod Creation](https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/activities/labs/lab1/)
 
 [Pod Config](https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/activities/labs/lab2/)
+
+## Sidecar Design Pattern
+
+Sidecar Implementation shares the same IP Address (localhost)
+
+	READY
+	2/2
+
+To retrieve info from another container 
+
+	k get pods
+	k exec -it my-pod bash
+	curl http://localhost:8080
+	> Hello from the side container
+
+Sidecar implementation is good for circuit breaking, service mesh, certificates, etc.
+However if done incorrectly, it adds extra load and it doesn't scale well 
+
+## Liveness and Readiness Probes
+
+[https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/observability/](https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/observability/)
+
+The probe constantly checks the status to see the status of the container
+
+* ExecAction
+	* simple command to check if container is alive
+* TCPSocketAction 
+	* just check if this socket is open
+	* i.e. check that port 8080 is open
+* HTTP
+	* declare endpoint, if returns 200 then it's okay
+	* i.e. /live /help /healthz
+
+### Using liveness.yaml
+	
+	k apply -f foo.yaml
+	k get pods
+	k describe pod my-pod -o yaml
+
+Example in yaml
+
+	livenessProbe:
+		tcpSocket:
+			port:  8080
+		initialDelaySeconds:  10
+	readinessProbe:
+		httpGet:
+			path: /
+			port:  8080
+		periodSeconds:  10
+
+## Container Logging
+
+### Using container.yaml
+
+Usually not just 1 container running, so aggregate logs across containers
+
+Gives all the logs of every container
+
+	stern .
+
+Good to see all logs in a separate windows to debug
+
+To check all the logs with "counter" in the name.
+
+	stern counter .
+	
+## Monitoring Applications
+
+	minikube addons enable metrics-server
+	get pods -A -w
+	> NAMESPACE     NAME                               READY   STATUS              RESTARTS   AGE
+	  default       my-pod                             1/1     Running             1          80m
+	  kube-system   coredns-5644d7b6d9-k2zpv           1/1     Running             0          132m
+	  kube-system   coredns-5644d7b6d9-nq2pr           1/1     Running             0          132m
+	  kube-system   etcd-minikube                      1/1     Running             0          131m
+	  kube-system   kube-addon-manager-minikube        1/1     Running             0          132m
+	  kube-system   kube-apiserver-minikube            1/1     Running             0          132m
+	  kube-system   kube-controller-manager-minikube   1/1     Running             0          131m
+	  kube-system   kube-proxy-s87nk                   1/1     Running             0          132m
+	  kube-system   kube-scheduler-minikube            1/1     Running             0          131m
+	  kube-system   metrics-server-6754dbc9df-2svt9    0/1     ContainerCreating   0          5s
+	  kube-system   storage-provisioner                1/1     Running             0          132m
+	  web           website-pod                        1/1     Running             0          123m
+	  kube-system   metrics-server-6754dbc9df-2svt9    1/1     Running             0          6s
+
+Not immediate, takes time for metrics to be collected
+
+### Using monitor1.yaml, monitor2.yaml
+	k apply -f monitor1.yaml
+	k apply -f monitor2.yaml
+	k describe node
+	k top pods
+	k top nodes
+
+## Lab
+
+[Probes](https://pages.github.ibm.com/CASE/cloudnative-bootcamp/kubernetes/activities/labs/lab4/)
