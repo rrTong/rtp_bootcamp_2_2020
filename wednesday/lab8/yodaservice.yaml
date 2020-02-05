@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yoda-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: yoda-deployment
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+
