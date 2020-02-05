@@ -1,0 +1,16 @@
+{
+  "command": ["f", 2, 3],
+  "containers": 
+    [
+      {
+        "name": "container1",
+        "image": "nginx",
+        "command": [
+          "sh",
+          "-c",
+          "echo 2"
+        ],
+        "config.cfg":"firstline=foo\nSecondline=bar"
+      }
+    ]
+}

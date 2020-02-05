@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: candy-service-config
+data:
+  candy.cfg: |-
+    candy.peppermint.power=100000000
+    candy.nougat-armor.strength=10
+​
+---
+​
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: candy-svc
+​
+---
+​
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-password
+data:
+  DB_PASSWORD: S3ViM3JuM3Qzc1J1bDNzIQo= 
+​
+---
+​
+apiVersion: v1
+kind: Pod
+metadata:
+  name: candy-service-pod
+spec:
+  containers:
+  - name: candy-svc-container
+    image: linuxacademycontent/candy-service:1
+    volumeMounts:
+    - name: config
+      mountPath: /etc/candy-service
+    envFrom:
+    - secretRef:
+        name: db-password
+  volumes:
+  - name: config
+    configMap:
+      name: candy-service-config
+  restartPolicy: Never

@@ -2,9 +2,6 @@
 
 [https://ibm.box.com/s/dgz6x8nqfd61d7p59y520g1bhmgoc7zo](https://ibm.box.com/s/dgz6x8nqfd61d7p59y520g1bhmgoc7zo)
 
-## Summary of Commands
-
-
 ## Notes
 
 Find container named “myapp”

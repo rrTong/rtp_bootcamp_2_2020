@@ -1,0 +1,19 @@
+spec:
+  containers:
+    - name: app
+      image: gcr.io/kubernetes-e2e-test-
+      resources:
+        requests:
+          cpu: 300m
+          memory: 64Mi
+    - name: busybox-sidecar
+      image: radial/busyboxplus:curl
+      command:
+        [
+          /bin/sh,
+          -c,
+          "until curl localhost"
+        ]
+      config.cfg: |-
+      Firstline=foo
+      Secondline=bar
