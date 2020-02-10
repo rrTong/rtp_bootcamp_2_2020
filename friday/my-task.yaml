@@ -1,0 +1,34 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: demo
+spec:
+  inputs:
+    params:
+      - name: TOOL_IMAGE
+        default: docker.io/csantanapr/helm-kubectl-curl-git-jq-yq
+  steps:
+    - name: step-1
+      image: $(inputs.params.TOOL_IMAGE)
+      command: ["/bin/bash"]
+      args:
+        - -c
+        - |
+          set -e
+          pwd
+          git clone --branch master --depth 1 https://github.com/csantanapr/cloudnative_sample_app_deploy /workspace/repo
+          echo "NEW_IMAGE_ID=docker.io/csantanapr/cloudnative_sample_app:1234" >> /workspace/env-config
+          ls
+    - name: step-2
+      image: $(inputs.params.TOOL_IMAGE)
+      command: ["/bin/bash"]
+      args:
+        - -c
+        - |
+          set -e
+          pwd
+          . env-config
+          ls -l /workspace/repo/
+          cat /workspace/repo/README.md
+          echo Here is the new image $NEW_IMAGE_ID
+
